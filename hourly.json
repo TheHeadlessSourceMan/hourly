@@ -1,0 +1,53 @@
+{
+    "relativeMinutes":-5,
+    "items":[
+        {
+            "message":"3 pull-ups",
+            "randomWeight":1.0
+        },
+        {
+            "message":"10 dips",
+            "randomWeight":1.0
+        },
+        {
+            "message":"10 push-ups",
+            "randomWeight":1.0
+        },
+        {
+            "message":"50 btw",
+            "randomWeight":1.0
+        },
+        {
+            "message":"12 sit-ups",
+            "randomWeight":1.0
+        },
+        {
+            "message":"10 in-the-buckets, each arm",
+            "randomWeight":1.0
+        },
+        {
+            "message":"5 minute bike",
+            "randomWeight":1.0
+        },
+        {
+            "message":"run up driveway",
+            "randomWeight":0.1
+        },
+        {
+            "message":"5 minute office clean",
+            "randomWeight":1.0
+        },
+        {
+            "message":"5 minute garage floor clean",
+            "randomWeight":1.0
+        },
+        {
+            "message":"5 minute tablesaw clean",
+            "randomWeight":5.0
+        },
+        {
+            "message":"MMBWA - ManageMent By Walking Around",
+            "randomWeight":10.0
+        }
+    ]
+}
