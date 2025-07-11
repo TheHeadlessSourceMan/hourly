@@ -7,6 +7,7 @@ import random
 import json
 import datetime
 from tkinter import messagebox
+from playSound import playSound
 
 
 class HourlyItem:
@@ -14,11 +15,13 @@ class HourlyItem:
     A single item that can come up in an hourly chime
     """
     def __init__(self,
+        parent:"HourlyItemSet",
         soundFile:str='',
         message:str='',
         jsonData:typing.Dict=None,
         jsonFile:str=''):
         """ """
+        self.parent=parent
         self._watchThread:typing.Optional[typing.Any]=None
         self.randomWeight=1.0
         self.soundFile=soundFile
@@ -47,7 +50,11 @@ class HourlyItem:
         Run this item
         """
         if self.soundFile:
-            print("TODO: play sound")
+            soundFile=self.soundFile
+            if not soundFile:
+                soundFile=self.parent.soundFile
+            if soundFile:
+                playSound(soundFile)
         if self.message:
             print(self.message)
             messagebox.showwarning("Hourly Task",self.message)
@@ -93,10 +100,26 @@ class HourlyItemSet:
     A set of hourly items
     """
 
-    def __init__(self):
+    def __init__(self,
+        parent:"HourlyItemSet"):
+        """ """
+        self.parent=parent
         self.randomize:bool=False
         self.items:typing.List[HourlyItem]=[]
         self._nextHourlyItemIdx:int=0
+        self._soundFile:typing.Optional[str]=None
+
+    @property
+    def soundFile(self)->str:
+        """
+        Sound file for this group
+        """
+        if self._soundFile is not None:
+            return self._soundFile
+        return self.parent.soundFile
+    @soundFile.setter
+    def soundFile(self,soundFile:str):
+        self._soundFile=soundFile
 
     def weightToIdx(self,weight:float)->int:
         """
@@ -145,10 +168,11 @@ class HourlyChime(HourlyItemSet):
         jsonData:typing.Dict=None,
         jsonFile:str=''):
         """ """
-        HourlyItemSet.__init__(self)
+        HourlyItemSet.__init__(self,self)
         self.relativeMinutes=relativeMinutes
         self.randomize=randomize
         self.items=list(items)
+        self.soundFile=''
         if jsonData is not None:
             self.jsonData=jsonData
         if jsonFile:
@@ -166,9 +190,10 @@ class HourlyChime(HourlyItemSet):
             jsonData=json.loads(jsonData)
         self.relativeMinutes=int(jsonData.get("minutes",-5))
         self.randomize=jsonData.get("randomize","f")[0] in ('f','F')
+        self.soundFile=jsonData.get('soundFile','')
         self.items=[]
         for itemData in jsonData["items"]:
-            self.items.append(HourlyItem(jsonData=itemData))
+            self.items.append(HourlyItem(self,jsonData=itemData))
 
     def load(self,filename:str):
         """
@@ -192,7 +217,8 @@ class HourlyChime(HourlyItemSet):
                 nextTime=nextTime+datetime.timedelta(hours=1)
                 delta=nextTime-now
             sec=delta.total_seconds()
-            print(f"*** now={now} next={nextTime} in {sec}s ***")
+            minutes=sec/60
+            print(f"*** now={now} next={nextTime} in {round(minutes)} minutes ***") # noqa: E501
             time.sleep(delta.total_seconds())
             item=self.getNextItem()
             item()
